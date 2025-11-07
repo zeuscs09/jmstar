@@ -239,6 +239,93 @@
         --bs-table-accent-bg: rgba(111, 217, 255, 0.12);
       }
 
+      .activity-radio-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .activity-radio-option {
+        position: relative;
+        border: 1px solid rgba(111, 54, 255, 0.2);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        background: rgba(255, 255, 255, 0.92);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .activity-radio-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 38px -30px rgba(70, 105, 255, 0.45);
+      }
+
+      .activity-radio-option.active {
+        border-color: rgba(106, 139, 255, 0.9);
+        box-shadow: 0 22px 44px -32px rgba(106, 139, 255, 0.55);
+      }
+
+      .activity-radio-option .activity-name {
+        font-weight: 700;
+        color: #32508b;
+      }
+
+      .activity-radio-option .activity-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+        color: #6a728d;
+      }
+
+      .activity-radio-option .activity-stars {
+        align-self: flex-start;
+        font-size: 0.85rem;
+        color: #c07900;
+        background: rgba(255, 193, 7, 0.18);
+        border-radius: 999px;
+        padding: 0.25rem 0.6rem;
+        font-weight: 600;
+      }
+
+      .jmstar-modal-alert {
+        position: sticky;
+        top: -1rem;
+        z-index: 5;
+        min-height: 1px;
+      }
+
+      .jmstar-modal-alert .alert {
+        border-radius: 16px;
+        box-shadow: 0 18px 40px -32px rgba(49, 73, 142, 0.38);
+      }
+
+      .jmstar-stars-modal .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .jmstar-stars-modal .nav-tabs .nav-link {
+        box-shadow: none;
+      }
+
+      .jmstar-stars-modal .nav-tabs .nav-link.active {
+        box-shadow: 0 14px 32px -26px rgba(43, 67, 132, 0.4);
+      }
+
+      .jmstar-stars-modal .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+
+      .child-avatar--xl {
+        width: 88px;
+        height: 88px;
+        border-width: 4px;
+      }
+
       @media (max-width: 767.98px) {
         .jmstar-wrapper {
           padding: 2.25rem 1rem 3rem;
@@ -258,6 +345,19 @@
 
         .jmstar-tab-pane {
           padding: 1.35rem;
+        }
+
+        .jmstar-stars-modal .modal-body {
+          max-height: none;
+        }
+
+        .child-avatar--xl {
+          width: 72px;
+          height: 72px;
+        }
+
+        .activity-radio-group {
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         }
       }
     </style>
@@ -296,217 +396,243 @@
           <div class="row g-3" id="children-container"></div>
         </section>
 
-        <section class="mt-4" id="stars-action-panels" style="display: none;">
-          <ul class="nav nav-tabs" id="jmstar-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link active"
-                id="tab-add-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#tab-add"
-                type="button"
-                role="tab"
-              >
-                เพิ่มดาว
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link"
-                id="tab-adjust-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#tab-adjust"
-                type="button"
-                role="tab"
-              >
-                ปรับยอด
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link"
-                id="tab-redeem-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#tab-redeem"
-                type="button"
-                role="tab"
-              >
-                แลกดาว
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link"
-                id="tab-history-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#tab-history"
-                type="button"
-                role="tab"
-              >
-                ประวัติ
-              </button>
-            </li>
-          </ul>
+        <div
+          class="modal fade jmstar-stars-modal"
+          id="stars-action-modal"
+          tabindex="-1"
+          aria-labelledby="stars-action-modal-label"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+              <div class="modal-header border-0 pb-0 align-items-start">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="child-avatar child-avatar--xl" id="selected-child-avatar"></div>
+                  <div>
+                    <h5 class="modal-title mb-1" id="stars-action-modal-label">
+                      <span id="selected-child-name">เลือกน้องเพื่อจัดการดาว</span>
+                    </h5>
+                    <p class="text-muted small mb-0">
+                      คงเหลือ <span id="selected-child-available">0</span> ⭐️ 
+                    </p>
+                  </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+              </div>
+              <div class="modal-body pt-3">
+                <div id="stars-modal-alert" class="jmstar-modal-alert" role="status"></div>
+                <section class="mt-2" id="stars-action-panels">
+                  <ul class="nav nav-tabs" id="jmstar-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button
+                        class="nav-link active"
+                        id="tab-add-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-add"
+                        type="button"
+                        role="tab"
+                      >
+                        เพิ่มดาว
+                      </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button
+                        class="nav-link"
+                        id="tab-adjust-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-adjust"
+                        type="button"
+                        role="tab"
+                      >
+                        ปรับยอด
+                      </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button
+                        class="nav-link"
+                        id="tab-redeem-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-redeem"
+                        type="button"
+                        role="tab"
+                      >
+                        แลกดาว
+                      </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button
+                        class="nav-link"
+                        id="tab-history-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-history"
+                        type="button"
+                        role="tab"
+                      >
+                        ประวัติ
+                      </button>
+                    </li>
+                  </ul>
 
-          <div class="tab-content jmstar-tab-pane">
-            <div class="tab-pane fade show active" id="tab-add" role="tabpanel">
-              <div class="row justify-content-center">
-                <div class="col-lg-8">
-                  <div class="card jmstar-form-card">
-                    <div class="card-header">เพิ่มดาวให้น้อง</div>
-                    <div class="card-body">
-                      <form id="add-stars-form" class="row g-3">
-                        <div class="col-md-6">
-                          <label class="form-label">เลือกเด็ก *</label>
-                          <select class="form-select" id="add-stars-child" name="child" required></select>
+                  <div class="tab-content jmstar-tab-pane">
+                    <div class="tab-pane fade show active" id="tab-add" role="tabpanel">
+                      <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                          <div class="card jmstar-form-card">
+                            <div class="card-header">เพิ่มดาวให้น้อง</div>
+                            <div class="card-body">
+                              <form id="add-stars-form" class="row g-3">
+                          <input type="hidden" id="add-stars-child" name="child" />
+                                <div class="col-md-6">
+                                  <label class="form-label">กิจกรรม</label>
+                          <div class="activity-radio-group" id="add-stars-activity-list"></div>
+                          <input type="hidden" id="add-stars-activity" name="activity" />
+                          <div class="text-muted small mt-1">เลือกกิจกรรมเพื่อเติมค่าดาวอัตโนมัติ หรือไม่เลือกก็ได้</div>
+                                </div>
+                                <div class="col-md-6">
+                                  <label class="form-label">จำนวนดาว *</label>
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    id="add-stars-value"
+                                    name="stars"
+                                    min="1"
+                                    value="1"
+                                    required
+                                  />
+                                </div>
+                                <div class="col-md-6">
+                                  <label class="form-label">หมายเหตุ</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    name="notes"
+                                    placeholder="เพิ่มรายละเอียดเล็กน้อย"
+                                  />
+                                </div>
+                                <div class="col-12">
+                                  <button type="submit" class="btn btn-primary w-100">เพิ่มดาว</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
                         </div>
-                        <div class="col-md-6">
-                          <label class="form-label">กิจกรรม</label>
-                          <select class="form-select" id="add-stars-activity" name="activity"></select>
+                      </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-redeem" role="tabpanel">
+                      <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                          <div class="card jmstar-form-card">
+                            <div class="card-header">แลกดาวเพื่อรางวัล</div>
+                            <div class="card-body">
+                              <form id="redeem-form" class="row g-3">
+                          <input type="hidden" id="redeem-child" name="child" />
+                                <div class="col-md-6">
+                                  <label class="form-label">จำนวนดาว *</label>
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    name="stars"
+                                    min="1"
+                                    value="1"
+                                    required
+                                  />
+                                </div>
+                                <div class="col-12">
+                                  <label class="form-label">ใช้ทำอะไร</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    name="redemption_use"
+                                    placeholder="เช่น ไปเที่ยวสวนสนุก"
+                                  />
+                                </div>
+                                <div class="col-12">
+                                  <label class="form-label">หมายเหตุ</label>
+                                  <textarea class="form-control" name="notes" rows="2"></textarea>
+                                </div>
+                                <div class="col-12">
+                                  <button type="submit" class="btn btn-primary w-100">แลกดาว</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
                         </div>
-                        <div class="col-md-6">
-                          <label class="form-label">จำนวนดาว *</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            id="add-stars-value"
-                            name="stars"
-                            min="1"
-                            value="1"
-                            required
-                          />
+                      </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-adjust" role="tabpanel">
+                      <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                          <div class="card jmstar-form-card">
+                            <div class="card-header">ปรับยอดดาว (เพิ่มหรือลด)</div>
+                            <div class="card-body">
+                              <form id="adjust-form" class="row g-3">
+                          <input type="hidden" id="adjust-child" name="child" />
+                                <div class="col-md-6">
+                                  <label class="form-label">จำนวนดาว (ใส่ค่าบวกหรือลบ) *</label>
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    id="adjust-stars-value"
+                                    name="stars"
+                                    value="0"
+                                    step="1"
+                                    required
+                                  />
+                                </div>
+                                <div class="col-12">
+                                  <label class="form-label">หมายเหตุ</label>
+                                  <textarea class="form-control" name="notes" rows="2"></textarea>
+                                </div>
+                                <div class="col-12 text-muted small">
+                                  * ค่าบวก = เพิ่มดาวเข้า, ค่าลบ = ปรับลดดาวออก โดยไม่ตรวจสอบยอดคงเหลือ
+                                </div>
+                                <div class="col-12">
+                                  <button type="submit" class="btn btn-primary w-100">ปรับยอด</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
                         </div>
-                        <div class="col-md-6">
-                          <label class="form-label">หมายเหตุ</label>
-                          <input
-                            type="text"
-                            class="form-control"
-                            name="notes"
-                            placeholder="เพิ่มรายละเอียดเล็กน้อย"
-                          />
+                      </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-history" role="tabpanel">
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="fw-semibold text-muted">
+                              ประวัติของ <span class="text-primary" id="history-child-display">-</span>
+                            </div>
+                            <div class="text-muted small">แสดงล่าสุด 20 รายการ</div>
+                          </div>
                         </div>
                         <div class="col-12">
-                          <button type="submit" class="btn btn-primary w-100">เพิ่มดาว</button>
+                          <div class="table-responsive">
+                            <table class="table table-striped align-middle" id="history-table">
+                              <thead>
+                                <tr>
+                                  <th>วันที่</th>
+                                  <th>กิจกรรม</th>
+                                  <th>ประเภท</th>
+                                  <th class="text-end">ดาว</th>
+                                  <th class="text-end">คงเหลือ</th>
+                                  <th>รายละเอียด</th>
+                                </tr>
+                              </thead>
+                              <tbody></tbody>
+                            </table>
+                          </div>
                         </div>
-                      </form>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-pane fade" id="tab-redeem" role="tabpanel">
-              <div class="row justify-content-center">
-                <div class="col-lg-8">
-                  <div class="card jmstar-form-card">
-                    <div class="card-header">แลกดาวเพื่อรางวัล</div>
-                    <div class="card-body">
-                      <form id="redeem-form" class="row g-3">
-                        <div class="col-md-6">
-                          <label class="form-label">เลือกเด็ก *</label>
-                          <select class="form-select" name="child" required></select>
-                        </div>
-                        <div class="col-md-6">
-                          <label class="form-label">จำนวนดาว *</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            name="stars"
-                            min="1"
-                            value="1"
-                            required
-                          />
-                        </div>
-                        <div class="col-12">
-                          <label class="form-label">ใช้ทำอะไร</label>
-                          <input
-                            type="text"
-                            class="form-control"
-                            name="redemption_use"
-                            placeholder="เช่น ไปเที่ยวสวนสนุก"
-                          />
-                        </div>
-                        <div class="col-12">
-                          <label class="form-label">หมายเหตุ</label>
-                          <textarea class="form-control" name="notes" rows="2"></textarea>
-                        </div>
-                        <div class="col-12">
-                          <button type="submit" class="btn btn-primary w-100">แลกดาว</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-pane fade" id="tab-adjust" role="tabpanel">
-              <div class="row justify-content-center">
-                <div class="col-lg-8">
-                  <div class="card jmstar-form-card">
-                    <div class="card-header">ปรับยอดดาว (เพิ่มหรือลด)</div>
-                    <div class="card-body">
-                      <form id="adjust-form" class="row g-3">
-                        <div class="col-md-6">
-                          <label class="form-label">เลือกเด็ก *</label>
-                          <select class="form-select" id="adjust-child" name="child" required></select>
-                        </div>
-                        <div class="col-md-6">
-                          <label class="form-label">จำนวนดาว (ใส่ค่าบวกหรือลบ) *</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            id="adjust-stars-value"
-                            name="stars"
-                            value="0"
-                            step="1"
-                            required
-                          />
-                        </div>
-                        <div class="col-12">
-                          <label class="form-label">หมายเหตุ</label>
-                          <textarea class="form-control" name="notes" rows="2"></textarea>
-                        </div>
-                        <div class="col-12 text-muted small">
-                          * ค่าบวก = เพิ่มดาวเข้า, ค่าลบ = ปรับลดดาวออก โดยไม่ตรวจสอบยอดคงเหลือ
-                        </div>
-                        <div class="col-12">
-                          <button type="submit" class="btn btn-primary w-100">ปรับยอด</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-pane fade" id="tab-history" role="tabpanel">
-              <div class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label">เลือกเด็ก</label>
-                  <select class="form-select" id="history-child"></select>
-                </div>
-                <div class="col-12">
-                  <div class="table-responsive">
-                    <table class="table table-striped align-middle" id="history-table">
-                      <thead>
-                        <tr>
-                          <th>วันที่</th>
-                          <th>กิจกรรม</th>
-                          <th>ประเภท</th>
-                          <th class="text-end">ดาว</th>
-                          <th class="text-end">คงเหลือ</th>
-                          <th>รายละเอียด</th>
-                        </tr>
-                      </thead>
-                      <tbody></tbody>
-                    </table>
-                  </div>
-                </div>
+                </section>
               </div>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </main>
 

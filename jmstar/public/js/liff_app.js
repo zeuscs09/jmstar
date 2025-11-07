@@ -138,6 +138,7 @@
 
     childAvatarUploading: false,
     childAvatarStatusDefault: "",
+    modalAlertTimeout: null,
 
     init() {
       this.cacheDom();
@@ -175,14 +176,22 @@
       this.$addStarsForm = $("#add-stars-form");
       this.$addStarsChild = $("#add-stars-child");
       this.$addStarsActivity = $("#add-stars-activity");
+      this.$addStarsActivityList = $("#add-stars-activity-list");
       this.$addStarsValue = $("#add-stars-value");
-      this.$historyChild = $("#history-child");
+      this.$historyChildDisplay = $("#history-child-display");
       this.$historyBody = $("#history-table tbody");
       this.$redeemForm = $("#redeem-form");
+      this.$redeemChild = $("#redeem-child");
       this.$adjustForm = $("#adjust-form");
       this.$adjustChild = $("#adjust-child");
       this.$adjustStarsInput = $("#adjust-stars-value");
       this.$starsActionPanels = $("#stars-action-panels");
+      this.$starsActionModal = $("#stars-action-modal");
+      this.$starsModalAlert = $("#stars-modal-alert");
+      this.$selectedChildName = $("#selected-child-name");
+      this.$selectedChildAvailable = $("#selected-child-available");
+      this.$selectedChildTotal = $("#selected-child-total");
+      this.$selectedChildAvatar = $("#selected-child-avatar");
       this.$loadingOverlay = $("#jmstar-loading");
 
       const bootstrapLib =
@@ -198,6 +207,10 @@
       this.activityModal =
         this.$activityModal.length && bootstrapLib && bootstrapLib.Modal
           ? new bootstrapLib.Modal(this.$activityModal[0], { backdrop: "static" })
+          : null;
+      this.starsActionModal =
+        this.$starsActionModal.length && bootstrapLib && bootstrapLib.Modal
+          ? new bootstrapLib.Modal(this.$starsActionModal[0], { backdrop: true })
           : null;
     },
 
@@ -306,6 +319,19 @@
         });
       }
 
+      if (this.$addStarsActivityList.length) {
+        this.$addStarsActivityList.on("click", "[data-action=choose-activity]", (event) => {
+          const activityId = $(event.currentTarget).data("activityId");
+          this.setActivitySelection(activityId || "");
+        });
+      }
+
+      if (this.$starsActionModal.length) {
+        this.$starsActionModal.on("hidden.bs.modal", () => {
+          this.showModalAlert();
+        });
+      }
+
       if (this.$redeemForm.length) {
         this.$redeemForm.on("submit", (event) => {
           event.preventDefault();
@@ -320,11 +346,6 @@
         });
       }
 
-      if (this.$historyChild.length) {
-        this.$historyChild.on("change", () => {
-          this.refreshHistory();
-        });
-      }
     },
 
     async bootstrap() {
@@ -480,7 +501,6 @@
       });
  
       this.$childrenContainer.html(childEntries.join(""));
-      this.showStarsActionPanels();
     },
 
     renderActivities() {
@@ -544,47 +564,78 @@
     },
 
     updateChildSelects() {
+      const selectedChildId = this.state.selectedChild || "";
+      const childSummary = this.getChildData(selectedChildId);
+
+      if (this.$addStarsChild.length) {
+        this.$addStarsChild.val(selectedChildId);
+      }
+
+      if (this.$adjustChild.length) {
+        this.$adjustChild.val(selectedChildId);
+      }
+
+      if (this.$redeemChild && this.$redeemChild.length) {
+        this.$redeemChild.val(selectedChildId);
+      }
+
+      if (this.$historyChildDisplay && this.$historyChildDisplay.length) {
+        this.$historyChildDisplay.text(childSummary ? childSummary.displayName : "-");
+      }
+
       if (!this.state.children.length) {
         return;
-      }
-
-      const options = this.state.children.map(
-        (child) => `<option value="${child.name}">${child.display_name || child.child_name}</option>`
-      );
-
-      const placeholder = '<option value="" disabled>เลือกเด็ก</option>';
-      if (this.$addStarsChild.length) {
-        this.$addStarsChild.html(placeholder + options.join(""));
-        this.$addStarsChild.val(this.state.selectedChild || "");
-      }
- 
-      if (this.$adjustChild.length) {
-        this.$adjustChild.html(placeholder + options.join(""));
-        this.$adjustChild.val(this.state.selectedChild || "");
-      }
-
-      if (this.$redeemForm.length) {
-        const select = this.$redeemForm.find("select[name=child]");
-        if (select.length) {
-          select.html(placeholder + options.join(""));
-          select.val(this.state.selectedChild || "");
-        }
-      }
-
-      if (this.$historyChild.length) {
-        this.$historyChild.html(options.join(""));
-        this.$historyChild.val(this.state.selectedChild || (this.state.children[0] && this.state.children[0].name));
       }
     },
 
     updateActivitySelects() {
-      const options = this.state.activities.map(
-        (activity) => `<option value="${activity.name}" data-stars="${activity.default_star_value}">${activity.activity_name}</option>`
-      );
+      const selectedActivityId = this.$addStarsActivity.val() || "";
 
-      const optionManual = '<option value="">เลือกกิจกรรม / กรอกเอง</option>';
-      this.$addStarsActivity.html(optionManual + options.join(""));
-      this.$addStarsActivity.prop("selectedIndex", 0);
+      if (!this.$addStarsActivityList.length) {
+        return;
+      }
+
+      if (!this.state.activities.length) {
+        this.$addStarsActivityList.html(
+          '<div class="alert alert-info mb-0">ยังไม่มีกิจกรรม ลองเพิ่มในเมนู "ตั้งค่า" ก่อนนะ</div>'
+        );
+        this.setActivitySelection("");
+        return;
+      }
+
+      const manualOption = `
+        <div class="activity-radio-option ${selectedActivityId ? "" : "active"}" data-action="choose-activity" data-activity-id="">
+          <div class="activity-name">ไม่ระบุกิจกรรม</div>
+          <div class="activity-meta">
+            <span>กำหนดจำนวนดาวเองได้</span>
+          </div>
+        </div>
+      `;
+
+      const options = this.state.activities.map((activity) => {
+        const activityId = escapeHtml(activity.name);
+        const isActive = selectedActivityId === activity.name;
+        const starValue = parseInt(activity.default_star_value, 10);
+        const stars = Number.isFinite(starValue) ? starValue : 0;
+        const category = escapeHtml(activity.category || "ไม่ระบุหมวด");
+        const activityName = escapeHtml(activity.activity_name || "กิจกรรม");
+        const description = activity.description
+          ? `<div class="text-muted small">${escapeHtml(activity.description)}</div>`
+          : "";
+        return `
+          <div class="activity-radio-option ${isActive ? "active" : ""}" data-action="choose-activity" data-activity-id="${activityId}">
+            <div class="activity-name">${activityName}</div>
+            <div class="activity-meta">
+              <span>${category}</span>
+              <span class="activity-stars">+${stars} ⭐️</span>
+            </div>
+            ${description}
+          </div>
+        `;
+      });
+
+      this.$addStarsActivityList.html(manualOption + options.join(""));
+      this.setActivitySelection(selectedActivityId);
     },
 
     selectChild(childId, { refreshHistory = false, scrollToHistory = false } = {}) {
@@ -606,6 +657,7 @@
 
     selectStarChild(childId) {
       this.state.selectedChild = childId;
+      this.showModalAlert();
       this.renderChildren();
       this.showStarsActionPanels();
       this.openStarsTab("add");
@@ -892,11 +944,13 @@
 
       if (!payload.child) {
         this.showAlert("กรุณาเลือกเด็ก", "warning");
+        this.showModalAlert("กรุณาเลือกเด็กก่อนเพิ่มดาว", "warning");
         return;
       }
 
       if (!payload.stars || payload.stars <= 0) {
         this.showAlert("จำนวนดาวต้องมากกว่า 0", "warning");
+        this.showModalAlert("จำนวนดาวต้องมากกว่า 0", "warning");
         return;
       }
 
@@ -910,11 +964,13 @@
         this.renderChildren();
         this.updateChildSelects();
         this.showAlert("เพิ่มดาวเรียบร้อยแล้ว", "success");
+        this.showModalAlert("เพิ่มดาวให้น้องเรียบร้อยแล้ว", "success");
         this.refreshHistory();
         this.showStarsActionPanels();
         this.openStarsTab("add");
       } catch (error) {
         this.showAlert(error.message, "danger");
+        this.showModalAlert(error.message, "danger");
       }
     },
 
@@ -926,11 +982,13 @@
 
       if (!payload.child) {
         this.showAlert("กรุณาเลือกเด็ก", "warning");
+        this.showModalAlert("กรุณาเลือกเด็กก่อนแลกดาว", "warning");
         return;
       }
 
       if (!payload.stars || payload.stars <= 0) {
         this.showAlert("จำนวนดาวที่ต้องการแลกต้องมากกว่า 0", "warning");
+        this.showModalAlert("จำนวนดาวที่ต้องการแลกต้องมากกว่า 0", "warning");
         return;
       }
 
@@ -943,11 +1001,13 @@
         this.renderChildren();
         this.updateChildSelects();
         this.showAlert("แลกดาวเรียบร้อยแล้ว", "success");
+        this.showModalAlert("แลกดาวเรียบร้อยแล้ว", "success");
         this.refreshHistory();
         this.showStarsActionPanels();
         this.openStarsTab("redeem");
       } catch (error) {
         this.showAlert(error.message, "danger");
+        this.showModalAlert(error.message, "danger");
       }
     },
  
@@ -959,11 +1019,13 @@
       const amount = parseInt(payload.stars, 10);
       if (!payload.child) {
         this.showAlert("กรุณาเลือกเด็ก", "warning");
+        this.showModalAlert("กรุณาเลือกเด็กก่อนปรับยอด", "warning");
         return;
       }
 
       if (Number.isNaN(amount) || amount === 0) {
         this.showAlert("กรุณาระบุจำนวนดาวที่จะปรับ (ไม่เป็นศูนย์)", "warning");
+        this.showModalAlert("กรุณาระบุจำนวนดาวที่จะปรับ (ไม่เป็นศูนย์)", "warning");
         return;
       }
 
@@ -978,6 +1040,7 @@
         this.renderChildren();
         this.updateChildSelects();
         this.showAlert("ปรับยอดดาวเรียบร้อยแล้ว", "success");
+        this.showModalAlert("ปรับยอดดาวเรียบร้อยแล้ว", "success");
         this.refreshHistory();
         this.showStarsActionPanels();
         this.openStarsTab("history");
@@ -986,6 +1049,7 @@
         }
       } catch (error) {
         this.showAlert(error.message, "danger");
+        this.showModalAlert(error.message, "danger");
       }
     },
 
@@ -994,11 +1058,14 @@
         return;
       }
 
-      const childId = (this.$historyChild.val && this.$historyChild.val()) || this.state.selectedChild;
+      const childId = this.state.selectedChild;
       if (!childId) {
         this.$historyBody.html(
           '<tr><td colspan="6" class="text-center text-muted">ยังไม่มีข้อมูล</td></tr>'
         );
+        if (this.$historyChildDisplay && this.$historyChildDisplay.length) {
+          this.$historyChildDisplay.text("-");
+        }
         return;
       }
 
@@ -1008,6 +1075,11 @@
           child: childId,
           limit: 20,
         });
+
+        const childSummary = this.getChildData(childId);
+        if (this.$historyChildDisplay && this.$historyChildDisplay.length) {
+          this.$historyChildDisplay.text(childSummary ? childSummary.displayName : "-");
+        }
 
         const rows = (result.entries || []).map((entry) => {
           const typeBadge = this.resolveTypeBadge(entry.transaction_type, entry.stars);
@@ -1053,8 +1125,17 @@
     },
 
     syncActivityDefaultValue() {
-      const selected = this.$addStarsActivity.find(":selected");
-      const suggestedStars = parseInt(selected.data("stars"), 10);
+      const selectedActivityId = this.$addStarsActivity.val();
+      if (!selectedActivityId) {
+        return;
+      }
+
+      const activity = this.state.activities.find((item) => item.name === selectedActivityId);
+      if (!activity) {
+        return;
+      }
+
+      const suggestedStars = parseInt(activity.default_star_value, 10);
       if (!Number.isNaN(suggestedStars) && suggestedStars > 0) {
         this.$addStarsValue.val(suggestedStars);
       }
@@ -1073,64 +1154,179 @@
       `;
       this.$alert.html(alertHtml);
     },
+
+    showModalAlert(message, variant = "info", options = {}) {
+      if (!this.$starsModalAlert || !this.$starsModalAlert.length) {
+        return;
+      }
+
+      if (this.modalAlertTimeout) {
+        clearTimeout(this.modalAlertTimeout);
+        this.modalAlertTimeout = null;
+      }
+
+      if (!message) {
+        this.$starsModalAlert.stop(true, true).empty().show();
+        return;
+      }
+
+      const alertHtml = `
+        <div class="alert alert-${variant} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+
+      this.$starsModalAlert.stop(true, true).hide().html(alertHtml).fadeIn(150);
+
+      const modalBody = this.$starsModalAlert.closest(".modal-body");
+      if (modalBody && modalBody.length) {
+        if (typeof modalBody[0].scrollTo === "function") {
+          modalBody[0].scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          modalBody.scrollTop(0);
+        }
+      }
+
+      const autoDismiss = options.autoDismiss !== false;
+      const duration = Number.isFinite(options.duration) ? options.duration : 4000;
+      if (autoDismiss) {
+        this.modalAlertTimeout = setTimeout(() => {
+          this.$starsModalAlert.fadeOut(200, () => {
+            this.$starsModalAlert.empty().show();
+          });
+          this.modalAlertTimeout = null;
+        }, duration);
+      }
+    },
  
-    renderStarChildList() {
-      if (!this.$childrenContainer.length) {
-        return;
-      }
-
-      if (!this.state.children.length) {
-        this.$childrenContainer.html(
-          '<div class="alert alert-info mb-0">ยังไม่มีรายชื่อเด็ก ลองเพิ่มได้จากเมนู "ตั้งค่า"</div>'
-        );
-        this.state.selectedChild = null;
-        this.showStarsActionPanels();
-        return;
-      }
-
-      const childEntries = this.state.children.map((child) => {
-        const avatarUrl = child.avatar ? encodeURI(child.avatar) : "";
-        const isSelected = this.state.selectedChild === child.name;
-        return `
-          <div class="col-md-4 mb-3">
-            <div class="card child-card child-card--action ${isSelected ? "active" : ""}" data-action="choose-star-child" data-child-id="${child.name}">
-              <div class="card-body text-center">
-                <div class="child-avatar mx-auto mb-3" style="background-image: url('${avatarUrl}')"></div>
-                <h5 class="card-title">${child.display_name || child.child_name}</h5>
-                <p class="card-subtitle text-muted">คงเหลือ ${child.available_stars || 0} ⭐️</p>
-                <p class="mt-2 text-muted small">แตะเพื่อเลือกและจัดการดาว</p>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      this.$childrenContainer.html(childEntries.join(""));
-    },
-
-    selectStarChild(childId) {
-      this.state.selectedChild = childId;
-      this.renderChildren();
-      this.showStarsActionPanels();
-      this.openStarsTab("add");
-    },
-
     showStarsActionPanels() {
       if (!this.$starsActionPanels || !this.$starsActionPanels.length) {
         return;
       }
 
       if (!this.state.selectedChild) {
-        this.$starsActionPanels.hide();
+        this.updateSelectedChildSummary();
+        this.closeStarsActionModal();
+        this.showModalAlert();
         return;
       }
 
+      this.updateSelectedChildSummary();
       this.updateChildSelects();
       this.refreshHistory();
       if (this.$adjustStarsInput && this.$adjustStarsInput.length) {
         this.$adjustStarsInput.val(0);
       }
-      this.$starsActionPanels.show();
+      this.openStarsActionModal();
+    },
+
+    openStarsActionModal() {
+      if (this.starsActionModal) {
+        this.starsActionModal.show();
+        return;
+      }
+
+      if (this.$starsActionModal && this.$starsActionModal.length) {
+        this.$starsActionModal.addClass("show").attr("aria-hidden", "false").css("display", "block");
+        document.body.classList.add("modal-open");
+      }
+    },
+
+    closeStarsActionModal() {
+      if (this.starsActionModal) {
+        this.starsActionModal.hide();
+        this.showModalAlert();
+        return;
+      }
+
+      if (this.$starsActionModal && this.$starsActionModal.length) {
+        this.$starsActionModal.removeClass("show").attr("aria-hidden", "true").css("display", "none");
+        document.body.classList.remove("modal-open");
+      }
+      this.showModalAlert();
+    },
+
+    updateSelectedChildSummary() {
+      if (!this.$selectedChildName || !this.$selectedChildName.length) {
+        return;
+      }
+
+      const childData = this.getChildData(this.state.selectedChild);
+      if (!childData) {
+        this.$selectedChildName.text("เลือกน้องเพื่อจัดการดาว");
+        if (this.$selectedChildAvailable && this.$selectedChildAvailable.length) {
+          this.$selectedChildAvailable.text("0");
+        }
+        if (this.$selectedChildTotal && this.$selectedChildTotal.length) {
+          this.$selectedChildTotal.text("0");
+        }
+        if (this.$selectedChildAvatar && this.$selectedChildAvatar.length) {
+          this.$selectedChildAvatar.css("background-image", "");
+        }
+        return;
+      }
+
+      this.$selectedChildName.text(childData.displayName);
+      if (this.$selectedChildAvailable && this.$selectedChildAvailable.length) {
+        this.$selectedChildAvailable.text(childData.available);
+      }
+      if (this.$selectedChildTotal && this.$selectedChildTotal.length) {
+        this.$selectedChildTotal.text(childData.total);
+      }
+
+      if (this.$selectedChildAvatar && this.$selectedChildAvatar.length) {
+        if (childData.avatarUrl) {
+          this.$selectedChildAvatar.css("background-image", `url('${childData.avatarUrl}')`);
+        } else {
+          this.$selectedChildAvatar.css("background-image", "");
+        }
+      }
+    },
+
+    getChildData(childId) {
+      if (!childId) {
+        return null;
+      }
+
+      const child = this.state.children.find((item) => item.name === childId);
+      if (!child) {
+        return null;
+      }
+
+      const displayName = child.display_name || child.child_name || "น้องคนนี้";
+      const availableValue = parseInt(child.available_stars, 10);
+      const totalValue = parseInt(child.total_stars, 10);
+
+      return {
+        child,
+        id: child.name,
+        displayName,
+        available: Number.isFinite(availableValue) ? availableValue : 0,
+        total: Number.isFinite(totalValue) ? totalValue : 0,
+        avatarUrl: child.avatar ? encodeURI(child.avatar) : "",
+      };
+    },
+
+    setActivitySelection(activityId) {
+      const normalizedId = activityId || "";
+      if (this.$addStarsActivity && this.$addStarsActivity.length) {
+        this.$addStarsActivity.val(normalizedId);
+      }
+
+      if (this.$addStarsActivityList && this.$addStarsActivityList.length) {
+        this.$addStarsActivityList
+          .find("[data-action=choose-activity]")
+          .each((index, element) => {
+            const $option = $(element);
+            const optionId = $option.data("activityId") || "";
+            $option.toggleClass("active", optionId === normalizedId);
+          });
+      }
+
+      if (normalizedId) {
+        this.syncActivityDefaultValue();
+      }
     },
 
     openStarsTab(target) {
