@@ -1,6 +1,6 @@
 (function () {
   const API_BASE = "/api/method/jmstar.jmstar.api.liff.";
-  const AVATAR_MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+  const AVATAR_MAX_SIZE = 4 * 1024 * 1024; // 4 MB
   const FALLBACK_LINE_UID = window.JMSTAR_TEST_LINE_UID || "TEST-LINE-UID-001";
 
   const Api = {
@@ -787,7 +787,7 @@
       }
 
       if (file.size > AVATAR_MAX_SIZE) {
-        this.updateChildAvatarStatus("ขนาดไฟล์ต้องไม่เกิน 2 MB", "error");
+        this.updateChildAvatarStatus("ขนาดไฟล์ต้องไม่เกิน 4 MB", "error");
         this.$childAvatarUpload.val("");
         return;
       }

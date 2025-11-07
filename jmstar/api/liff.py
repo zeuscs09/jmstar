@@ -255,7 +255,7 @@ def _hydrate_activity_name(entries: List[Dict[str, Any]]) -> None:
 
 TEST_LINE_UID = "TEST-LINE-UID-001"
 TEST_DISPLAY_NAME = "Test Guardian"
-AVATAR_MAX_FILE_SIZE = 2 * 1024 * 1024  # 2 MB
+AVATAR_MAX_FILE_SIZE = 4 * 1024 * 1024  # 4 MB
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -373,14 +373,14 @@ def upload_child_avatar() -> Dict[str, Any]:
         frappe.throw(_("ไฟล์ว่างเปล่า กรุณาลองใหม่"))
 
     if len(file_stream) > AVATAR_MAX_FILE_SIZE:
-        frappe.throw(_("ขนาดไฟล์ต้องไม่เกิน 2 MB"))
+        frappe.throw(_("ขนาดไฟล์ต้องไม่เกิน 4 MB"))
 
     saved_file = save_file(
         fname=uploaded.filename,
         content=file_stream,
         dt="Guardian",
         dn=guardian.name,
-        is_private=1,
+        is_private=0,
     )
 
     return {"file_url": saved_file.file_url, "file_name": saved_file.file_name}
