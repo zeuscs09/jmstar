@@ -28,6 +28,51 @@ def _get_request_data() -> Dict[str, Any]:
     return frappe._dict(data)
 
 
+def _resolve_liff_environment(explicit: Optional[str] = None) -> Optional[str]:
+    if explicit:
+        return explicit
+
+    conf = getattr(frappe.local, "conf", None) or getattr(frappe, "conf", {})
+    for key in ("liff_environment", "environment", "env"):
+        value = conf.get(key) if conf else None
+        if value:
+            return value
+    return None
+
+
+def _get_active_liff_config(environment: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    filters: Dict[str, Any] = {"is_active": 1}
+    if environment:
+        filters["environment"] = environment
+
+    configs = frappe.get_all(
+        "Liff App Config",
+        filters=filters,
+        fields=[
+            "name",
+            "app_name",
+            "environment",
+            "liff_id",
+            "channel_id",
+            "channel_secret",
+            "callback_url",
+            "allowed_paths",
+            "description",
+        ],
+        order_by="modified desc",
+        limit=1,
+    )
+
+    if configs:
+        return frappe._dict(configs[0])
+
+    if environment:
+        # Retry without environment filter as a graceful fallback
+        return _get_active_liff_config(environment=None)
+
+    return None
+
+
 def _require(param: Any, label: str) -> Any:
     if param in (None, ""):
         frappe.throw(_("{0} is required.").format(label))
@@ -211,6 +256,32 @@ def _hydrate_activity_name(entries: List[Dict[str, Any]]) -> None:
 TEST_LINE_UID = "TEST-LINE-UID-001"
 TEST_DISPLAY_NAME = "Test Guardian"
 AVATAR_MAX_FILE_SIZE = 2 * 1024 * 1024  # 2 MB
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])
+def get_config(environment: Optional[str] = None) -> Dict[str, Any]:
+    resolved_env = _resolve_liff_environment(environment or frappe.form_dict.get("environment"))
+    config = _get_active_liff_config(resolved_env)
+
+    if not config:
+        frappe.throw(_("ยังไม่มีการตั้งค่า LIFF ที่พร้อมใช้งาน"))
+
+    allowed_paths_raw = config.get("allowed_paths") or ""
+    allowed_paths = [
+        path.strip()
+        for path in allowed_paths_raw.splitlines()
+        if path and path.strip()
+    ]
+
+    return {
+        "app_name": config.get("app_name"),
+        "environment": config.get("environment"),
+        "liff_id": config.get("liff_id"),
+        "channel_id": config.get("channel_id"),
+        "callback_url": config.get("callback_url"),
+        "allowed_paths": allowed_paths,
+        "description": config.get("description"),
+    }
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST", "GET"])

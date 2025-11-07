@@ -4,6 +4,10 @@
   const FALLBACK_LINE_UID = window.JMSTAR_TEST_LINE_UID || "TEST-LINE-UID-001";
 
   const Api = {
+    getConfig(params) {
+      return this.get("get_config", params);
+    },
+
     async post(method, payload) {
       const response = await fetch(`${API_BASE}${method}`, {
         method: "POST",
@@ -129,6 +133,7 @@
 
   const App = {
     state: {
+      liffConfig: null,
       guardian: null,
       children: [],
       activities: [],
@@ -351,6 +356,11 @@
     async bootstrap() {
       this.toggleLoading(true);
       try {
+        const environment = document.body.dataset.environment;
+        this.state.liffConfig = await Api.getConfig(
+          environment ? { environment } : undefined
+        );
+
         const profile = await this.resolveProfile();
         this.state.lineUid = profile.line_uid;
 
@@ -382,20 +392,26 @@
 
     async resolveProfile() {
       if (window.liff && typeof window.liff.init === "function") {
-        try {
-          await window.liff.init({ withLoginOnExternalBrowser: true });
-          if (!window.liff.isLoggedIn()) {
-            window.liff.login();
-            return { line_uid: FALLBACK_LINE_UID, display_name: "Guest", avatar: null };
+        const liffConfig = this.state && this.state.liffConfig ? this.state.liffConfig : null;
+        const liffId = liffConfig ? liffConfig.liff_id : null;
+        if (!liffId) {
+          console.warn("Missing LIFF ID configuration; falling back to test UID");
+        } else {
+          try {
+            await window.liff.init({ liffId, withLoginOnExternalBrowser: true });
+            if (!window.liff.isLoggedIn()) {
+              window.liff.login();
+              return { line_uid: FALLBACK_LINE_UID, display_name: "Guest", avatar: null };
+            }
+            const profile = await window.liff.getProfile();
+            return {
+              line_uid: profile.userId,
+              display_name: profile.displayName,
+              avatar: profile.pictureUrl,
+            };
+          } catch (error) {
+            console.warn("LIFF initialization failed, falling back to test UID", error);
           }
-          const profile = await window.liff.getProfile();
-          return {
-            line_uid: profile.userId,
-            display_name: profile.displayName,
-            avatar: profile.pictureUrl,
-          };
-        } catch (error) {
-          console.warn("LIFF initialization failed, falling back to test UID", error);
         }
       }
 

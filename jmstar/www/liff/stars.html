@@ -227,8 +227,93 @@
         background: rgba(255, 255, 255, 0.92);
       }
 
+      .jmstar-children-grid #children-container {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        padding: 0;
+        margin: 0;
+      }
+
       .jmstar-children-grid #children-container > div {
+        display: block;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .jmstar-children-grid .child-card {
+        border: none;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 22px 50px -35px rgba(40, 58, 115, 0.45) !important;
+        transition: transform 0.22s ease, box-shadow 0.25s ease;
+        cursor: pointer;
+      }
+
+      .jmstar-children-grid .child-card .card-body {
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 1.6rem 1.5rem;
+        text-align: center;
+      }
+
+      .jmstar-children-grid .child-card .child-avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 26px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: rgba(255, 255, 255, 0.25);
+        box-shadow: inset 0 0 0 3px rgba(49, 73, 142, 0.08), 0 12px 28px -20px rgba(42, 65, 120, 0.45);
+      }
+
+      .jmstar-children-grid .child-card .card-title {
+        font-family: "Itim", cursive;
+        font-size: 1.4rem;
+        color: #2b3f75;
+        margin-bottom: 0.15rem;
+      }
+
+      .jmstar-children-grid .child-card .card-subtitle {
+        font-weight: 600;
+        color: #4f5d92 !important;
+        margin-bottom: 0;
+      }
+
+      .jmstar-children-grid .child-card .mt-2 {
+        color: rgba(79, 93, 146, 0.72) !important;
+        margin-bottom: 0;
+      }
+
+      .jmstar-children-grid .child-card--action {
+        background: linear-gradient(160deg, rgba(141, 215, 255, 0.96), rgba(106, 139, 255, 0.95)) !important;
+        color: #fff;
+        box-shadow: 0 28px 60px -38px rgba(67, 110, 255, 0.55) !important;
+      }
+
+      .jmstar-children-grid .child-card--action .card-subtitle {
+        color: rgba(255, 255, 255, 0.92) !important;
+      }
+
+      .jmstar-children-grid .child-card--action .mt-2 {
+        color: rgba(255, 255, 255, 0.78) !important;
+      }
+
+      .jmstar-children-grid .child-card--action .child-avatar {
+        box-shadow: 0 18px 44px -28px rgba(23, 61, 155, 0.55);
+        border: 3px solid rgba(255, 255, 255, 0.35);
+      }
+
+      .jmstar-children-grid .child-card.active {
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 32px 68px -40px rgba(46, 80, 170, 0.6) !important;
+      }
+
+      .jmstar-children-grid .child-card.active .mt-2 {
+        color: rgba(255, 255, 255, 0.88) !important;
       }
 
       .table tbody tr {
@@ -358,6 +443,23 @@
 
         .activity-radio-group {
           grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        }
+
+        .jmstar-children-grid #children-container {
+          grid-template-columns: 1fr;
+        }
+
+        .jmstar-children-grid .child-card .card-body {
+          padding: 1.4rem 1.2rem;
+        }
+
+        .jmstar-children-grid .child-card .child-avatar {
+          width: 76px;
+          height: 76px;
+        }
+
+        .jmstar-children-grid .child-card .card-title {
+          font-size: 1.3rem;
         }
       }
     </style>
