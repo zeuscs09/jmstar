@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>เด็กดีมีดาว · เด็กในระบบ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Itim&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="/assets/jmstar/css/liff_app.css" />
+
+    <style>
+      body {
+        font-family: "Noto Sans Thai", sans-serif;
+        background: radial-gradient(circle at top, #fef4ff 0%, #fef9f1 40%, #f7fbff 100%);
+        color: #1f1b2e;
+        min-height: 100vh;
+      }
+
+      .jmstar-wrapper {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+
+      .jmstar-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2.25rem;
+      }
+
+      .jmstar-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #5a368d;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 12px 36px -24px rgba(38, 15, 84, 0.55);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .jmstar-back-link:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 16px 44px -26px rgba(38, 15, 84, 0.55);
+      }
+
+      .jmstar-nav-group {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .jmstar-nav-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 0.55rem 1.2rem;
+        font-weight: 600;
+        color: #553381;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 15px 40px -28px rgba(58, 16, 110, 0.45);
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .jmstar-nav-btn:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .jmstar-nav-btn.active {
+        background: linear-gradient(135deg, #ffb6ff, #9d7bff);
+        color: #fff;
+      }
+
+      .jmstar-header {
+        position: relative;
+        padding: 2.2rem 1.3rem 2.7rem;
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(255, 195, 113, 0.45), rgba(255, 105, 180, 0.4));
+        box-shadow: 0 24px 55px -35px rgba(255, 122, 163, 0.65);
+        overflow: hidden;
+        margin-bottom: 2.25rem;
+      }
+
+      .jmstar-header::after,
+      .jmstar-header::before {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        opacity: 0.4;
+      }
+
+      .jmstar-header::before {
+        width: 160px;
+        height: 160px;
+        background: rgba(255, 255, 255, 0.35);
+        top: -45px;
+        right: -35px;
+      }
+
+      .jmstar-header::after {
+        width: 110px;
+        height: 110px;
+        background: rgba(253, 249, 212, 0.55);
+        bottom: -40px;
+        left: -25px;
+      }
+
+      .jmstar-header h1 {
+        font-family: "Itim", cursive;
+        font-size: 2.4rem;
+        color: #4a1c6f;
+        margin-bottom: 0.6rem;
+      }
+
+      .jmstar-header .lead {
+        font-weight: 600;
+        color: #482263;
+        margin-bottom: 0.35rem;
+      }
+
+      .jmstar-header .text-muted {
+        color: rgba(74, 28, 111, 0.75) !important;
+      }
+
+      .jmstar-section-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-weight: 700;
+        color: #4d2b7e;
+        font-size: 1.2rem;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 0.6rem 1.05rem;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px -30px rgba(49, 10, 98, 0.35);
+      }
+
+      .jmstar-section-title .emoji {
+        font-size: 1.5rem;
+      }
+
+      .jmstar-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #ff9ad5, #ff6fb7);
+        border: none;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.55rem 1.4rem;
+        box-shadow: 0 16px 44px -26px rgba(255, 111, 183, 0.6);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #ff85cc, #ff59aa);
+      }
+
+      .jmstar-app-card {
+        background: rgba(255, 255, 255, 0.82);
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: 0 25px 60px -40px rgba(52, 11, 103, 0.35);
+      }
+
+      .row.g-3 > [class*="col"] {
+        display: flex;
+      }
+
+      #children-container > div {
+        display: flex;
+      }
+
+      .jmstar-modal .modal-content {
+        border: none;
+        border-radius: 28px;
+        background: #fff6ff;
+        box-shadow: 0 35px 85px -45px rgba(59, 12, 104, 0.55);
+      }
+
+      .jmstar-modal .modal-header {
+        padding: 1.6rem 1.8rem 1.4rem;
+        border-bottom: none;
+        border-radius: 28px 28px 0 0;
+        background: linear-gradient(135deg, rgba(255, 155, 215, 0.85), rgba(255, 111, 183, 0.8));
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .jmstar-modal .modal-header::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.22);
+        border-radius: 50%;
+        top: -70px;
+        right: -60px;
+      }
+
+      .jmstar-modal .modal-title {
+        font-family: "Itim", cursive;
+        font-size: 1.9rem;
+        font-weight: 700;
+      }
+
+      .jmstar-modal .btn-close {
+        filter: invert(1);
+        opacity: 0.85;
+      }
+
+      .jmstar-modal .modal-body {
+        padding: 1.9rem 1.8rem 0.6rem;
+      }
+
+      .jmstar-modal .form-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-weight: 700;
+        color: #4a2d73;
+        margin-bottom: 0.35rem;
+        white-space: nowrap;
+      }
+
+      .jmstar-modal .form-control,
+      .jmstar-modal .form-select {
+        border-radius: 16px;
+        border: 1px solid rgba(120, 82, 164, 0.18);
+        padding: 0.65rem 0.9rem;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: inset 0 2px 8px rgba(76, 47, 112, 0.05);
+      }
+
+      .jmstar-avatar-uploader {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .jmstar-avatar-visual {
+        width: 96px;
+        height: 96px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 0 2px rgba(121, 60, 143, 0.12), 0 12px 30px -18px rgba(49, 15, 93, 0.45);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .jmstar-avatar-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .jmstar-avatar-placeholder {
+        font-size: 2rem;
+        color: rgba(90, 54, 141, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+      }
+
+      .jmstar-avatar-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .jmstar-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #ffb6ff, #9d7bff);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .jmstar-upload-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px -18px rgba(92, 59, 140, 0.5);
+      }
+
+      #child-avatar-upload {
+        display: none;
+      }
+
+      .jmstar-avatar-remove {
+        align-self: flex-start;
+        padding: 0;
+        font-weight: 600;
+        color: #7b549f;
+      }
+
+      .jmstar-avatar-remove:hover {
+        color: #5b3a91;
+      }
+
+      .jmstar-avatar-status {
+        font-size: 0.85rem;
+        color: rgba(74, 45, 115, 0.65);
+      }
+
+      .jmstar-avatar-status.text-danger {
+        color: #d9534f !important;
+      }
+
+      .jmstar-modal .modal-footer {
+        border-top: none;
+        padding: 0 1.8rem 1.6rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .jmstar-modal .btn-outline-secondary {
+        border-radius: 999px;
+        padding: 0.55rem 1.35rem;
+        font-weight: 600;
+        color: #5c3b8c;
+        border-color: rgba(92, 59, 140, 0.28);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .jmstar-modal .btn-outline-secondary:hover {
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .jmstar-modal .btn-primary {
+        width: 100%;
+      }
+
+      @media (max-width: 575.98px) {
+        .jmstar-modal .form-label {
+          white-space: normal;
+        }
+
+        .jmstar-modal .modal-content {
+          border-radius: 24px;
+        }
+
+        .jmstar-modal .modal-body {
+          padding: 1.5rem 1.2rem 0.4rem;
+        }
+
+        .jmstar-modal .modal-footer {
+          padding: 0 1.2rem 1.4rem;
+        }
+
+        .jmstar-avatar-uploader {
+          gap: 0.75rem;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .jmstar-wrapper {
+          padding: 2.25rem 1rem 3rem;
+        }
+
+        .jmstar-header {
+          padding: 1.8rem 1.1rem 2.3rem;
+        }
+
+        .jmstar-header h1 {
+          font-size: 2rem;
+        }
+
+        .jmstar-nav-btn {
+          padding: 0.5rem 1rem;
+        }
+
+        .jmstar-toolbar {
+          gap: 0.75rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body data-screen="settings-kids">
+    <main class="jmstar-wrapper">
+      <div class="jmstar-topbar">
+        <a class="jmstar-back-link" href="/liff" aria-label="กลับเมนูหลัก">
+          <span>←</span>
+          <span>กลับเมนูหลัก</span>
+        </a>
+        <nav class="jmstar-nav-group" aria-label="สลับเมนูการตั้งค่า">
+          <a class="jmstar-nav-btn active" href="/liff/setting/kids">เด็ก</a>
+          <a class="jmstar-nav-btn" href="/liff/setting/activity">กิจกรรม</a>
+          <a class="jmstar-nav-btn" href="/liff/stars">ดาวสะสม</a>
+        </nav>
+      </div>
+
+      <div id="jmstar-alert"></div>
+      <div class="jmstar-app">
+        <div id="jmstar-loading" class="d-none">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <header class="jmstar-header text-center">
+          <h1>เด็กดีมีดาว</h1>
+          <p class="lead mb-1">จัดการข้อมูลเด็กในความดูแล</p>
+          <p class="text-muted mb-0">ผู้ดูแล: <strong id="guardian-name">-</strong></p>
+        </header>
+
+        <div class="jmstar-toolbar">
+          <div class="jmstar-section-title mb-0"><span class="emoji">🧒🏻</span> เด็กในระบบ</div>
+          <button type="button" class="btn btn-primary" id="open-child-modal">
+            <span class="me-1">+</span> เพิ่มเด็ก
+          </button>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="children-container"></div>
+      </div>
+    </main>
+
+    <div
+      class="modal fade"
+      id="child-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      aria-labelledby="child-form-title"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg jmstar-modal jmstar-modal-kids">
+        <div class="modal-content">
+          <form id="child-form" autocomplete="off">
+            <div class="modal-header">
+              <h5 class="modal-title" id="child-form-title">เพิ่มเด็กใหม่</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" id="child-id" name="child_id" />
+              <input type="hidden" id="child-avatar-url" name="avatar" />
+              <p class="text-muted small mb-3">
+                บอกชื่อ วันเกิด และเลือกรูปโปรไฟล์เพื่อให้น้องมีบัตรดาวสวย ๆ ประจำตัว
+              </p>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="child-name">ชื่อเต็ม *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="child-name"
+                    name="child_name"
+                    placeholder="เช่น น้องน้ำหวาน"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="child-date-of-birth">วันเกิด</label>
+                  <input type="date" class="form-control" id="child-date-of-birth" name="date_of_birth" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="child-avatar-upload">รูปโปรไฟล์</label>
+                  <div class="jmstar-avatar-uploader">
+                    <div class="jmstar-avatar-visual">
+                      <img src="" alt="ตัวอย่างรูปโปรไฟล์" id="child-avatar-preview" class="d-none" />
+                      <div class="jmstar-avatar-placeholder" id="child-avatar-placeholder">📷</div>
+                    </div>
+                    <div class="jmstar-avatar-actions">
+                      <label class="jmstar-upload-btn" for="child-avatar-upload">
+                        <input type="file" id="child-avatar-upload" accept="image/*" />
+                        เลือกรูปจากเครื่อง
+                      </label>
+                      <button type="button" class="btn btn-link jmstar-avatar-remove d-none" id="child-avatar-remove">
+                        ลบรูป
+                      </button>
+                      <small
+                        class="jmstar-avatar-status text-muted"
+                        id="child-avatar-status"
+                        data-default="ไฟล์ JPG/PNG ไม่เกิน 2 MB"
+                      >
+                        ไฟล์ JPG/PNG ไม่เกิน 2 MB
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline-secondary flex-grow-1"
+                id="child-form-reset"
+                data-bs-dismiss="modal"
+              >
+                ยกเลิก
+              </button>
+              <button type="submit" class="btn btn-primary flex-grow-1">บันทึก</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="/assets/jmstar/js/liff_app.js"></script>
+  </body>
+</html>

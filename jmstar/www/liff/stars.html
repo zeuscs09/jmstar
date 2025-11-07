@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>เด็กดีมีดาว · จัดการดาว</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Itim&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="/assets/jmstar/css/liff_app.css" />
+
+    <style>
+      body {
+        font-family: "Noto Sans Thai", sans-serif;
+        background: radial-gradient(circle at top, #fef4ff 0%, #fef9f1 40%, #f7fbff 100%);
+        color: #1f1b2e;
+        min-height: 100vh;
+      }
+
+      .jmstar-wrapper {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+
+      .jmstar-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2.25rem;
+      }
+
+      .jmstar-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #5a368d;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 12px 36px -24px rgba(38, 15, 84, 0.55);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .jmstar-back-link:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 16px 44px -26px rgba(38, 15, 84, 0.55);
+      }
+
+      .jmstar-nav-group {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .jmstar-nav-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 0.55rem 1.2rem;
+        font-weight: 600;
+        color: #553381;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 15px 40px -28px rgba(58, 16, 110, 0.45);
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .jmstar-nav-btn:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .jmstar-nav-btn.active {
+        background: linear-gradient(135deg, #6fd9ff, #6a8bff);
+        color: #fff;
+      }
+
+      .jmstar-header {
+        position: relative;
+        padding: 2.2rem 1.3rem 2.7rem;
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(111, 217, 255, 0.75), rgba(106, 139, 255, 0.65));
+        box-shadow: 0 28px 65px -38px rgba(70, 105, 255, 0.55);
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+        color: #fff;
+      }
+
+      .jmstar-header::after,
+      .jmstar-header::before {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        opacity: 0.35;
+      }
+
+      .jmstar-header::before {
+        width: 170px;
+        height: 170px;
+        background: rgba(255, 255, 255, 0.45);
+        top: -50px;
+        right: -40px;
+      }
+
+      .jmstar-header::after {
+        width: 130px;
+        height: 130px;
+        background: rgba(255, 255, 255, 0.4);
+        bottom: -55px;
+        left: -30px;
+      }
+
+      .jmstar-header h1 {
+        font-family: "Itim", cursive;
+        font-size: 2.5rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .jmstar-header .lead {
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .jmstar-header .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+      }
+
+      .jmstar-section-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-weight: 700;
+        color: #32508b;
+        font-size: 1.2rem;
+        background: rgba(255, 255, 255, 0.83);
+        padding: 0.6rem 1.05rem;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px -30px rgba(43, 58, 120, 0.32);
+      }
+
+      .jmstar-section-title .emoji {
+        font-size: 1.5rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #6fd9ff, #6a8bff);
+        border: none;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.55rem 1.4rem;
+        box-shadow: 0 16px 44px -26px rgba(91, 132, 255, 0.5);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #59c9ff, #5777ff);
+      }
+
+      .jmstar-tab-pane {
+        background: rgba(255, 255, 255, 0.82);
+        padding: 2rem;
+        border-radius: 24px;
+        box-shadow: 0 28px 60px -42px rgba(49, 73, 142, 0.4);
+        margin-top: 1.75rem;
+      }
+
+      .jmstar-tab-pane .card {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 24px;
+        box-shadow: 0 20px 45px -38px rgba(51, 75, 141, 0.4);
+        border: none;
+      }
+
+      .jmstar-tab-pane .card-header {
+        border-bottom: none;
+        background: transparent;
+        font-weight: 700;
+        color: #36518f;
+      }
+
+      .jmstar-tab-pane .card-body {
+        padding: 1.75rem;
+      }
+
+      .nav-tabs {
+        border-bottom: none;
+        display: inline-flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+      }
+
+      .nav-tabs .nav-link {
+        border: none;
+        border-radius: 999px;
+        padding: 0.55rem 1.2rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.75);
+        color: #38549b;
+        box-shadow: 0 14px 32px -26px rgba(43, 67, 132, 0.4);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #6fd9ff, #6a8bff);
+        color: #fff;
+        transform: translateY(-2px);
+      }
+
+      .nav-tabs .nav-link:hover {
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .jmstar-children-grid #children-container > div {
+        display: flex;
+      }
+
+      .table tbody tr {
+        background: rgba(255, 255, 255, 0.85);
+      }
+
+      .table-striped > tbody > tr:nth-of-type(odd) {
+        --bs-table-accent-bg: rgba(111, 217, 255, 0.12);
+      }
+
+      @media (max-width: 767.98px) {
+        .jmstar-wrapper {
+          padding: 2.25rem 1rem 3rem;
+        }
+
+        .jmstar-header {
+          padding: 1.9rem 1.2rem 2.4rem;
+        }
+
+        .jmstar-header h1 {
+          font-size: 2.1rem;
+        }
+
+        .jmstar-nav-btn {
+          padding: 0.5rem 1rem;
+        }
+
+        .jmstar-tab-pane {
+          padding: 1.35rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body data-screen="stars">
+    <main class="jmstar-wrapper">
+      <div class="jmstar-topbar">
+        <a class="jmstar-back-link" href="/liff" aria-label="กลับเมนูหลัก">
+          <span>←</span>
+          <span>กลับเมนูหลัก</span>
+        </a>
+        <nav class="jmstar-nav-group" aria-label="สลับเมนูการตั้งค่า">
+          <a class="jmstar-nav-btn" href="/liff/setting/kids">เด็ก</a>
+          <a class="jmstar-nav-btn" href="/liff/setting/activity">กิจกรรม</a>
+          <a class="jmstar-nav-btn active" href="/liff/stars">ดาวสะสม</a>
+        </nav>
+      </div>
+
+      <div id="jmstar-alert"></div>
+      <div class="jmstar-app">
+        <div id="jmstar-loading" class="d-none">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <header class="jmstar-header text-center">
+          <h1>เด็กดีมีดาว</h1>
+          <p class="lead mb-1">เลือกเด็กเพื่อจัดการดาว</p>
+          <p class="text-muted mb-0">ผู้ดูแล: <strong id="guardian-name">-</strong></p>
+        </header>
+
+        <section class="mb-4 jmstar-children-grid">
+          <div class="jmstar-section-title mb-3"><span class="emoji">🧒🏻</span> เลือกเด็ก</div>
+          <div class="row g-3" id="children-container"></div>
+        </section>
+
+        <section class="mt-4" id="stars-action-panels" style="display: none;">
+          <ul class="nav nav-tabs" id="jmstar-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="tab-add-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-add"
+                type="button"
+                role="tab"
+              >
+                เพิ่มดาว
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="tab-adjust-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-adjust"
+                type="button"
+                role="tab"
+              >
+                ปรับยอด
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="tab-redeem-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-redeem"
+                type="button"
+                role="tab"
+              >
+                แลกดาว
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="tab-history-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-history"
+                type="button"
+                role="tab"
+              >
+                ประวัติ
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content jmstar-tab-pane">
+            <div class="tab-pane fade show active" id="tab-add" role="tabpanel">
+              <div class="row justify-content-center">
+                <div class="col-lg-8">
+                  <div class="card jmstar-form-card">
+                    <div class="card-header">เพิ่มดาวให้น้อง</div>
+                    <div class="card-body">
+                      <form id="add-stars-form" class="row g-3">
+                        <div class="col-md-6">
+                          <label class="form-label">เลือกเด็ก *</label>
+                          <select class="form-select" id="add-stars-child" name="child" required></select>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">กิจกรรม</label>
+                          <select class="form-select" id="add-stars-activity" name="activity"></select>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">จำนวนดาว *</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="add-stars-value"
+                            name="stars"
+                            min="1"
+                            value="1"
+                            required
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">หมายเหตุ</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            name="notes"
+                            placeholder="เพิ่มรายละเอียดเล็กน้อย"
+                          />
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-primary w-100">เพิ่มดาว</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-redeem" role="tabpanel">
+              <div class="row justify-content-center">
+                <div class="col-lg-8">
+                  <div class="card jmstar-form-card">
+                    <div class="card-header">แลกดาวเพื่อรางวัล</div>
+                    <div class="card-body">
+                      <form id="redeem-form" class="row g-3">
+                        <div class="col-md-6">
+                          <label class="form-label">เลือกเด็ก *</label>
+                          <select class="form-select" name="child" required></select>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">จำนวนดาว *</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            name="stars"
+                            min="1"
+                            value="1"
+                            required
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">ใช้ทำอะไร</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            name="redemption_use"
+                            placeholder="เช่น ไปเที่ยวสวนสนุก"
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">หมายเหตุ</label>
+                          <textarea class="form-control" name="notes" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-primary w-100">แลกดาว</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-adjust" role="tabpanel">
+              <div class="row justify-content-center">
+                <div class="col-lg-8">
+                  <div class="card jmstar-form-card">
+                    <div class="card-header">ปรับยอดดาว (เพิ่มหรือลด)</div>
+                    <div class="card-body">
+                      <form id="adjust-form" class="row g-3">
+                        <div class="col-md-6">
+                          <label class="form-label">เลือกเด็ก *</label>
+                          <select class="form-select" id="adjust-child" name="child" required></select>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">จำนวนดาว (ใส่ค่าบวกหรือลบ) *</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="adjust-stars-value"
+                            name="stars"
+                            value="0"
+                            step="1"
+                            required
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">หมายเหตุ</label>
+                          <textarea class="form-control" name="notes" rows="2"></textarea>
+                        </div>
+                        <div class="col-12 text-muted small">
+                          * ค่าบวก = เพิ่มดาวเข้า, ค่าลบ = ปรับลดดาวออก โดยไม่ตรวจสอบยอดคงเหลือ
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-primary w-100">ปรับยอด</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-history" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">เลือกเด็ก</label>
+                  <select class="form-select" id="history-child"></select>
+                </div>
+                <div class="col-12">
+                  <div class="table-responsive">
+                    <table class="table table-striped align-middle" id="history-table">
+                      <thead>
+                        <tr>
+                          <th>วันที่</th>
+                          <th>กิจกรรม</th>
+                          <th>ประเภท</th>
+                          <th class="text-end">ดาว</th>
+                          <th class="text-end">คงเหลือ</th>
+                          <th>รายละเอียด</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="/assets/jmstar/js/liff_app.js"></script>
+  </body>
+</html>
