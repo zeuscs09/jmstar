@@ -1,0 +1,29 @@
+---
+description: Frappe Framework development commands and Docker environment rules
+globs: 
+  - "**/*.py"
+  - "**/*.js" 
+  - "**/hooks.py"
+  - "**/install.py"
+  - "**/patches.txt"
+  - "**/*.json"
+alwaysApply: true
+---
+
+# Frappe Framework Development Rules
+
+## Docker Environment
+- **Environment**: All Frappe commands run inside Docker containers
+- **Main containers**: `jmstarlocalhost-frappe`
+- **Working directory inside container**: `/workspace/frappe-bench`
+
+## Curl Use This Data
+    http://jmstar.localhost/
+    
+    {"Content-Type": "application/json", "Authorization": "token 9fab208ef186d93:d5d72d989a1f6e8"}
+### Docker Command Pattern
+```bash
+# Basic pattern for running bench commands
+docker exec [container-name] bash -c "cd frappe-bench && bench [command]"
+
+
