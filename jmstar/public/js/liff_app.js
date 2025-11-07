@@ -503,19 +503,24 @@
         const availableStarsValue = parseInt(child.available_stars, 10);
         const availableStars = Number.isFinite(availableStarsValue) ? availableStarsValue : 0;
         return `
-          <div class="col-md-4 mb-3">
-            <div class="card child-card child-card--action ${isSelected ? "active" : ""}" data-action="choose-star-child" data-child-id="${childId}">
-              <div class="card-body text-center">
-                <div class="child-avatar mx-auto mb-3" style="background-image: url('${avatarUrl}')"></div>
-                <h5 class="card-title">${displayName}</h5>
-                <p class="card-subtitle text-muted">คงเหลือ ${availableStars} ⭐️</p>
-                <p class="mt-2 text-muted small">แตะเพื่อเลือกและจัดการดาว</p>
+          <div class="jmstar-children-grid__item">
+            <button
+              type="button"
+              class="child-card child-card--action ${isSelected ? "active" : ""}"
+              data-action="choose-star-child"
+              data-child-id="${childId}"
+            >
+              <div class="card-body">
+                <div class="child-avatar mb-3" style="background-image: url('${avatarUrl}')"></div>
+                <h5 class="card-title mb-0">${displayName}</h5>
+                <p class="card-subtitle text-muted mb-1">คงเหลือ ${availableStars} ⭐️</p>
+                <p class="mt-2 text-muted small mb-0">แตะเพื่อเลือกและจัดการดาว</p>
               </div>
-            </div>
+            </button>
           </div>
         `;
       });
- 
+
       this.$childrenContainer.html(childEntries.join(""));
     },
 

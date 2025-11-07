@@ -241,13 +241,24 @@
         margin: 0 !important;
       }
 
+      .jmstar-children-grid__item {
+        width: 100%;
+      }
+
       .jmstar-children-grid .child-card {
         border: none;
         border-radius: 26px;
         background: rgba(255, 255, 255, 0.95) !important;
+        border: none;
         box-shadow: 0 22px 50px -35px rgba(40, 58, 115, 0.45) !important;
         transition: transform 0.22s ease, box-shadow 0.25s ease;
         cursor: pointer;
+        width: 100%;
+      }
+
+      .jmstar-children-grid .child-card:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 4px;
       }
 
       .jmstar-children-grid .child-card .card-body {
