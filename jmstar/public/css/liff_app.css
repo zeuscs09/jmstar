@@ -155,5 +155,52 @@ body {
     width: 56px;
     height: 56px;
   }
+
+  .child-card .card-title {
+    font-size: 1.1rem;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .child-card .card-subtitle,
+  .child-card .text-muted {
+    font-size: 0.85rem;
+    word-break: break-word;
+  }
+
+  .child-card .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  .child-card .btn {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  /* Modal improvements for mobile */
+  .modal-fullscreen-sm-down .modal-content {
+    border-radius: 0;
+  }
+
+  .modal-fullscreen-sm-down .modal-header,
+  .modal-fullscreen-sm-down .modal-footer {
+    border-radius: 0;
+  }
+
+  /* Ensure close button is touch-friendly */
+  .modal .btn-close {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 1rem;
+  }
+
+  /* Better keyboard handling on mobile */
+  .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 

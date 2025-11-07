@@ -37,7 +37,29 @@ def _resolve_liff_environment(explicit: Optional[str] = None) -> Optional[str]:
         value = conf.get(key) if conf else None
         if value:
             return value
+    if _is_localhost_request():
+        return "mock"
     return None
+
+
+def _is_localhost_request() -> bool:
+    request = getattr(frappe.local, "request", None)
+    host = ""
+    if request:
+        host = getattr(request, "host", "") or request.headers.get("Host", "")
+
+    if not host:
+        host = getattr(frappe.local, "site", "")
+
+    if not host:
+        return False
+
+    host = host.lower()
+    localhost_hosts = {"localhost", "127.0.0.1", "0.0.0.0"}
+    if host in localhost_hosts:
+        return True
+
+    return host.endswith(".localhost")
 
 
 def _get_active_liff_config(environment: Optional[str] = None) -> Optional[Dict[str, Any]]:
@@ -264,6 +286,17 @@ def get_config(environment: Optional[str] = None) -> Dict[str, Any]:
     config = _get_active_liff_config(resolved_env)
 
     if not config:
+        if _is_localhost_request():
+            return {
+                "app_name": "JMStar Mock",
+                "environment": resolved_env or "mock",
+                "liff_id": None,
+                "channel_id": None,
+                "callback_url": None,
+                "allowed_paths": [],
+                "description": "Local mock configuration",
+            }
+
         frappe.throw(_("ยังไม่มีการตั้งค่า LIFF ที่พร้อมใช้งาน"))
 
     allowed_paths_raw = config.get("allowed_paths") or ""
